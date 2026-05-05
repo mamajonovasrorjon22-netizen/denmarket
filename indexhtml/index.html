@@ -1,71 +1,10 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Den Market</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-        body{background:linear-gradient(135deg,#0a0a0a,#0a192f);min-height:100vh;padding:20px;color:#fff}
-        .header{text-align:center;margin-bottom:30px}
-        .logo{font-size:3rem}
-        .title{font-size:2rem;font-weight:bold;background:linear-gradient(135deg,#fff,#ffd89b);-webkit-background-clip:text;background-clip:text;color:transparent}
-        .subtitle{font-size:0.8rem;opacity:0.9}
-        .menu-list{display:flex;flex-direction:column;gap:12px;margin-bottom:25px}
-        .card{background:rgba(255,255,240,0.08);border-radius:24px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,0.15)}
-        .item-name{font-weight:600;font-size:1rem}
-        .price{font-size:0.85rem;color:#ffd89b;font-weight:bold}
-        .quantity-control{display:flex;align-items:center;gap:12px}
-        .qty-btn{background:rgba(255,255,255,0.15);border:none;width:34px;height:34px;border-radius:50%;font-size:1.2rem;color:#ffd89b;cursor:pointer}
-        .cart-section{background:rgba(0,0,0,0.5);border-radius:28px;padding:20px;margin-top:10px}
-        .cart-header{font-size:1.2rem;font-weight:bold;margin-bottom:15px;color:#ffd89b;display:flex;justify-content:space-between}
-        .clear-cart{background:none;border:none;color:#ff6b6b;cursor:pointer}
-        .cart-items{max-height:200px;overflow-y:auto;margin-bottom:15px}
-        .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1)}
-        .total{display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid rgba(255,255,255,0.1);font-weight:bold}
-        .total-amount{color:#ffd89b}
-        .location-btn{width:100%;padding:14px;border:none;border-radius:50px;background:#3c6e47;color:white;cursor:pointer;margin-bottom:12px}
-        .location-info{background:rgba(60,110,71,0.2);border-radius:12px;padding:8px;margin-bottom:12px;font-size:0.75rem;text-align:center;color:#ffd89b}
-        .input-group{margin:15px 0}
-        .input-label{font-size:0.75rem;opacity:0.8;margin-bottom:5px}
-        input,textarea{width:100%;padding:12px;border:none;border-radius:50px;background:rgba(255,255,255,0.9);font-size:0.9rem}
-        textarea{border-radius:20px;resize:vertical}
-        .btn{width:100%;padding:14px;border:none;border-radius:50px;font-size:1rem;font-weight:bold;background:linear-gradient(135deg,#ffd89b,#ffb347);color:#1a1a2e;cursor:pointer;margin-top:10px}
-        footer{text-align:center;font-size:0.6rem;margin-top:20px;opacity:0.6}
-    </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">🏪📦</div>
-        <div class="title">DEN MARKET</div>
-        <div class="subtitle">Hamma narsa bor, sifatli va arzon</div>
-    </div>
-    <div class="menu-list" id="menuList"></div>
-    <div class="cart-section">
-        <div class="cart-header"><span>🛒 SAVATCHA</span><button class="clear-cart" id="clearCartBtn">🗑️ Tozalash</button></div>
-        <div class="cart-items" id="cartItems">Savat bo'sh</div>
-        <div class="total"><span>💰 Jami</span><span class="total-amount" id="totalAmount">0 so'm</span></div>
-        <button class="location-btn" id="locationBtn">📍 Lokatsiyani yuborish</button>
-        <div id="locationInfo" class="location-info"></div>
-        <div class="input-group"><div class="input-label">📞 Telefon raqam</div><input type="tel" id="phone" placeholder="+998 __ ___ __ __"></div>
-        <div class="input-group"><div class="input-label">📍 Yetkazib berish manzili</div><textarea id="address" rows="2" placeholder="Ko'cha, uy, tuman, shahar..."></textarea></div>
-        <button class="btn" id="orderBtn">✅ BUYURTMA BERISH</button>
-    </div>
-    <footer>Den Market 2026 | Sifatli xizmat</footer>
-    <script>
-        const tg=window.Telegram.WebApp;tg.expand();tg.ready();
-        const PRODUCTS=[{name:"Kartoshka",price:7000},{name:"Piyoz",price:2000},{name:"Sabzi qizil",price:4000},{name:"Sabzi sariq",price:3300},{name:"Guruch xorazm Lazer",price:14000},{name:"Guruch Rishton Lazer",price:13000},{name:"Tuz roxat",price:5000},{name:"Kok Choy",price:20000},{name:"Donya yog'",price:100000},{name:"Farg'ona yog'",price:68000},{name:"Lazzat yog'",price:100000}];
-        let cart=JSON.parse(localStorage.getItem('cart'))||{};
-        let userLocation=null;
-        function render(){const c=document.getElementById('menuList');c.innerHTML='';for(const p of PRODUCTS){const q=cart[p.name]||0;c.innerHTML+=`<div class="card"><div><div class="item-name">${p.name}</div><div class="price">${p.price.toLocaleString()} so'm</div></div><div class="quantity-control"><button class="qty-btn" onclick="change('${p.name.replace(/'/g,"\\'")}',-1)">−</button><span style="min-width:25px;text-align:center">${q}</span><button class="qty-btn" onclick="change('${p.name.replace(/'/g,"\\'")}',1)">+</button></div></div>`;}}
-        function change(n,d){let c=cart[n]||0;let v=c+d;if(v<0)v=0;if(v===0)delete cart[n];else cart[n]=v;localStorage.setItem('cart',JSON.stringify(cart));render();updateCart();}
-        function updateCart(){const d=document.getElementById('cartItems');let t=0;d.innerHTML='';for(const[n,q]of Object.entries(cart)){const p=PRODUCTS.find(i=>i.name===n);if(!p)continue;const s=p.price*q;t+=s;d.innerHTML+=`<div class="cart-item"><span>${n} x${q}</span><span>${s.toLocaleString()} so'm</span></div>`;}if(Object.keys(cart).length===0)d.innerHTML='Savat bo\'sh';document.getElementById('totalAmount').innerHTML=t.toLocaleString()+' so\'m';}
-        document.getElementById('clearCartBtn').onclick=()=>{if(confirm("Savatni tozalansinmi?")){cart={};localStorage.setItem('cart',JSON.stringify(cart));render();updateCart();}};
-        document.getElementById('locationBtn').onclick=()=>{document.getElementById('locationInfo').innerHTML='⏳ Yuborilmoqda...';tg.requestLocation();};
-        tg.onEvent('locationSent',(l)=>{userLocation=l;document.getElementById('locationInfo').innerHTML=`✅ ${l.latitude.toFixed(4)}, ${l.longitude.toFixed(4)}`;document.getElementById('address').value=`${l.latitude.toFixed(4)}, ${l.longitude.toFixed(4)}`;});
-        document.getElementById('orderBtn').onclick=()=>{const p=document.getElementById('phone').value.trim();const a=document.getElementById('address').value.trim();if(Object.keys(cart).length===0)return tg.showPopup({title:"Xatolik",message:"Mahsulot tanlang!"});if(!p)return tg.showPopup({title:"Xatolik",message:"Telefon raqam kiriting!"});if(!a&&!userLocation)return tg.showPopup({title:"Xatolik",message:"Manzil kiriting!"});const t=Object.entries(cart).reduce((s,[n,q])=>s+(PRODUCTS.find(p=>p.name===n)?.price*q||0),0);tg.sendData(JSON.stringify({cart:t,phone:p,address:a||(userLocation?`${userLocation.latitude},${userLocation.longitude}`:'')}));tg.close();};
-        render();updateCart();
-    </script>
+    <h1>🏪 DEN MARKET</h1>
+    <p>Sayt ishga tushdi!</p>
 </body>
 </html>
