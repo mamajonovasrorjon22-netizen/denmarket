@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Den Market | Premium do'kon</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Premium fon effekti */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(255, 216, 155, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Asosiy konteyner */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER — Brend uslubi */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0 10px;
+            border-bottom: 1px solid rgba(255, 216, 155, 0.2);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .brand-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 216, 155, 0.3));
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ffd89b, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand-slogan {
+            font-size: 0.7rem;
+            color: #ffd89b;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Qidiruv va filtrlash — zamonaviy */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 2;
+            padding: 14px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 216, 155, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #ffd89b;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        select {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 216, 155, 0.2);
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Mahsulotlar ro'yxati — BIR QATOR */
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .product-card {
+            background: rgba(20, 20, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 216, 155, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: rgba(255, 216, 155, 0.4);
+            transform: translateX(5px);
+        }
+
+        .product-info {
+            flex: 2;
+        }
+
+        .product-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .product-weight {
+            font-size: 0.7rem;
+            color: #ffd89b;
+            background: rgba(255, 216, 155, 0.1);
+            padding: 2px 8px;
+            border-radius: 30px;
+        }
+
+        .product-price {
+            font-size: 0.8rem;
+            color: #ffd89b;
+            font-weight: 500;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .qty-btn {
+            background: rgba(255, 216, 155, 0.15);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd89b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #ffd89b;
+            color: #1a1a2e;
+        }
+
+        .qty-value {
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        /* Savatcha — premium */
+        .cart-section {
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 216, 155, 0.2);
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 216, 155, 0.15);
+        }
+
+        .cart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffd89b;
+        }
+
+        .clear-cart {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-item-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #ffd89b;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 216, 155, 0.2);
+            font-weight: bold;
+        }
+
+        .total-amount {
+            color: #ffd89b;
+            font-size: 1.2rem;
+        }
+
+        .location-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #2a5a35, #1e3a25);
+            color: white;
+            cursor: pointer;
+            margin: 12px 0;
+            transition: all 0.3s;
+        }
+
+        .location-info {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #ffd89b;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            margin: 12px 0;
+        }
+
+        .input-label {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd89b, #ffb347);
+            color: #0a0a0a;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            margin-top: 20px;
+            opacity: 0.4;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Premium Header -->
+        <div class="header">
+            <div class="brand">
+                <span class="brand-icon">🏪</span>
+                <span class="brand-name">DEN MARKET</span>
+                <span class="brand-icon">📦</span>
+            </div>
+            <div class="brand-slogan">PREMIUM SIFAT · TEZ YETKAZIB BERISH</div>
+        </div>
+
+        <!-- Qidiruv va filtrlash -->
+        <div class="filters">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Mahsulot qidirish...">
+            <select id="categorySelect">
+                <option value="all">📋 HAMMASI</option>
+                <option value="sabzavot">🥕 SABZAVOTLAR</option>
+                <option value="guruch">🍚 GURUCHLAR</option>
+                <option value="yog">🛢️ YOG'LAR</option>
+                <option value="boshqa">📦 BOSHQALAR</option>
+            </select>
+        </div>
+
+        <!-- Mahsulotlar ro'yxati -->
+        <div class="menu-list" id="menuList"></div>
+
+        <!-- Savatcha -->
+        <div class="cart-section">
+            <div class="cart-header">
+                <span class="cart-title">🛒 SAVATCHA</span>
+                <button class="clear-cart" id="clearCartBtn">🗑️ Tozalash</button>
+            </div>
+            <div class="cart-items" id="cartItems">Savat bo'sh</div>
+            <div class="total">
+                <span>💰 JAMI</span>
+                <span class="total-amount" id="totalAmount">0 so'm</span>
+            </div>
+
+            <button class="location-btn" id="locationBtn">📍 LOKATSIYANI YUBORISH</button>
+            <div id="locationInfo" class="location-info"></div>
+
+            <div class="input-group">
+                <div class="input-label">📞 TELEFON RAQAM</div>
+                <input type="tel" id="phone" placeholder="+998 __ ___ __ __">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">📍 YETKAZIB BERISH MANZILI</div>
+                <textarea id="address" rows="2" placeholder="Ko'cha, uy, tuman, shahar..."></textarea>
+            </div>
+
+            <button class="order-btn" id="orderBtn">✅ BUYURTMA BERISH</button>
+        </div>
+
+        <footer>Den Market 2026 | Premium sifat · Tez yetkazib berish</footer>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        const PRODUCTS = [
+            { name: "Kartoshka", price: 7000, weight: "1 kg", category: "sabzavot" },
+            { name: "Piyoz", price: 2000, weight: "1 kg", category: "sabzavot" },
+            { name: "Sabzi qizil", price: 4000, weight: "1 kg", category: "sabzavot" },
+            { name: "Sabzi sariq", price: 3300, weight: "1 kg", category: "sabzavot" },
+            { name: "Guruch xorazm Lazer", price: 14000, weight: "1 kg", category: "guruch" },
+            { name: "Guruch Rishton Lazer", price: 13000, weight: "1 kg", category: "guruch" },
+            { name: "Tuz roxat", price: 5000, weight: "1 kg", category: "boshqa" },
+            { name: "Kok Choy", price: 20000, weight: "0.5 kg", category: "boshqa" },
+            { name: "Donya yog'", price: 100000, weight: "5 L", category: "yog" },
+            { name: "Farg'ona yog'", price: 68000, weight: "3.6 kg", category: "yog" },
+            { name: "Lazzat yog'", price: 100000, weight: "5 L", category: "yog" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('den_market_cart')) || {};
+        let userLocation = null;
+        let searchTerm = '';
+        let selectedCategory = 'all';
+
+        function getWeight(product, qty) {
+            const weightValue = parseFloat(product.weight.split(' ')[0]);
+            const weightUnit = product.weight.split(' ')[1];
+            const total = weightValue * qty;
+            if (qty === 0) return '';
+            return `${total} ${weightUnit}`;
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const filtered = PRODUCTS.filter(p => {
+                return p.name.toLowerCase().includes(searchTerm) && (selectedCategory === 'all' || p.category === selectedCategory);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results">❌ Hech narsa topilmadi</div>';
+                return;
+            }
+
+            for (const p of filtered) {
+                const qty = cart[p.name] || 0;
+                container.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-info">
+                            <div class="product-name">
+                                ${p.name}
+                                <span class="product-weight">${p.weight}</span>
+                            </div>
+                            <div class="product-price">${p.price.toLocaleString()} so'm</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="changeQty('${p.name.replace(/'/g, "\\'")}', -1)">−</button>
+                            <span class="qty-value" id="qty-${p.name.replace(/\s/g,'')}">${qty}</span>
+                            <button class="qty-btn" onclick="changeQty('${p.name.replace(/'/g, "\\'")}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function changeQty(name, delta) {
+            let current = cart[name] || 0;
+            let newVal = current + delta;
+            if (newVal < 0) newVal = 0;
+            if (newVal === 0) delete cart[name];
+            else cart[name] = newVal;
+            localStorage.setItem('den_market_cart', JSON.stringify(cart));
+            renderMenu();
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartDiv = document.getElementById('cartItems');
+            let total = 0;
+            cartDiv.innerHTML = '';
+            for (const [name, qty] of Object.entries(cart)) {
+                const p = PRODUCTS.find(i => i.name === name);
+                if (!p) continue;
+                const sum = p.price * qty;
+                total += sum;
+                const totalWeight = getWeight(p, qty);
+                cartDiv.innerHTML += `
+                    <div class="cart-item">
+                        <span>${name} x${qty} ${totalWeight ? '= ' + totalWeight : ''}</span>
+                        <div class="cart-item-controls">
+                            <span>${sum.toLocaleString()} so'm</span>
+                            <button class="cart-item-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', -1)">−</button>
+                            <button class="cart-item-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+            if (Object.keys(cart).length === 0) cartDiv.innerHTML = 'Savat bo\'sh';
+            document.getElementById('totalAmount').innerHTML = total.toLocaleString() + ' so\'m';
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value.toLowerCase();
+            renderMenu();
+        });
+
+        document.getElementById('categorySelect').addEventListener('change', (e) => {
+            selectedCategory = e.target.value;
+            renderMenu();
+        });
+
+        document.getElementById('clearCartBtn').addEventListener('click', () => {
+            if (confirm("Savatni tozalansinmi?")) {
+                cart = {};
+                localStorage.setItem('den_market_cart', JSON.stringify(cart));
+                renderMenu();
+                updateCart();
+            }
+        });
+
+        document.getElementById('locationBtn').onclick = () => {
+            document.getElementById('locationInfo').innerHTML = '⏳ Lokatsiya yuborilmoqda...';
+            tg.requestLocation();
+        };
+
+        tg.onEvent('locationSent', (loc) => {
+            userLocation = loc;
+            document.getElementById('locationInfo').innerHTML = `✅ Lokatsiya qabul qilindi<br>📍 ${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`;
+            document.getElementById('address').value = `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`;
+        });
+
+        document.getElementById('orderBtn').onclick = () => {
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            if (Object.keys(cart).length === 0) return tg.showPopup({ title: "Xatolik", message: "Mahsulot tanlang!" });
+            if (!phone) return tg.showPopup({ title: "Xatolik", message: "Telefon raqam kiriting!" });
+            if (!address && !userLocation) return tg.showPopup({ title: "Xatolik", message: "Manzil yoki lokatsiya kiriting!" });
+            const total = Object.entries(cart).reduce((s, [n,q]) => s + (PRODUCTS.find(p=>p.name===n)?.price * q || 0), 0);
+            tg.sendData(JSON.stringify({ cart, total, phone, address: address || (userLocation ? `${userLocation.latitude},${userLocation.longitude}` : '') }));
+            tg.close();
+        };
+
+        renderMenu();
+        updateCart();
+    </script>
+</body>
+</html>
